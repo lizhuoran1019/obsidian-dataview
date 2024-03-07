@@ -72,6 +72,10 @@ export class DataviewCalendarRenderer extends DataviewRefreshableRenderer {
             target: (this as any).container,
             props: {
                 onHoverDay(date: Moment, targetEl: EventTarget): void {
+                    const element = targetEl as Element;
+                    if (!element.hasClass('dot')){
+                        return;
+                    }
                     const vals = dateMap.get(date.format("YYYYMMDD"));
                     if (!vals || vals.length == 0) {
                         return;
@@ -79,8 +83,11 @@ export class DataviewCalendarRenderer extends DataviewRefreshableRenderer {
                     if (vals?.length == 0) {
                         return;
                     }
-
-                    renderer.app.workspace.trigger("link-hover", {}, targetEl, vals[0].link.path, vals[0].link.path);
+                    if (element.parentElement == null) {
+                        return;
+                    }
+                    const index = Array.from(element.parentElement.children).indexOf(element);
+                    renderer.app.workspace.trigger("link-hover", {}, targetEl, vals[index].link.path, vals[index].link.path);
                 },
                 onClickDay: async date => {
                     const vals = dateMap.get(date.format("YYYYMMDD"));
